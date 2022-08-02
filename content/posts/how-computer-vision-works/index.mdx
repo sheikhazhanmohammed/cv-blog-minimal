@@ -19,5 +19,12 @@ The systems are fed with a large amount of data and their respective labels to w
 To begin with the understanding of computer vision, an important part is to understand how digital images are stored and comprehended by the system. We will first take a look at grayscale images and then move forward to RGB images.
 
 Let us look at the image of the numeric digit 8 shown below. 
-![Grayscale Image](./image_8_new.png)
-
+![Grayscale Image 8 normal view](./image_8_new.png)
+As we zoom into the image, we find the image getting distorder, until a point where we begin to see individual boxes with a shade of color between black and white. At this point, the image starts looking something like the image shown below.
+![Grayscale Image 8 zoomed view](./image_8_zoomed.png)
+These small individual boxes are referred as pixels. The number of pixels in each direction in the image refer to its resolution. For example a image having size 1080x720 would mean that the image has 1080 pixels in the horizontal direction and 720 pixels in the vertical direction. Each of these pixels contain an integer value, which depicts the intensity, for a grayscale or RGB image the value stored in these pixels vary between 0 to 255. The number closer to 0 represents a darker shade, while closer to 255 represents a lighter shade. So every image stored in a computer is stored in form of a matrix, where each element in the matrix represents the value at the mentioned pixel. Each of these matrices is also known as a channel. A grayscale image has single channel, while a RGB image has 3 channels, where each channel stores values of intensities for the particular color. The matrix for the grayscale 8 image would look something like the matrix shown below.
+![Grayscale Image 8 matrix view](./image_8_matrix.png)
+Now let us look at how colored, or more specifically RGB images are stored in a computer system. As discussed earlier, each colored image is composed of different channels, namely Red, Green and Blue. Decomping an image into these shades might give a result as the images shown below.
+![RGB Image decomposed into channels](./image_rgb_decomposed.png)
+So in this case, the image will have 3 different channels, each having intensities for the respective color spectrum. The collection of these matrices would look something like the matrix shown below, where each pixel will have a value ranging from 0 to 255, representing the intensity of respective color with regards to the pixel.
+![RGB Image matrix](./image_rgb_matrix_form.png)
