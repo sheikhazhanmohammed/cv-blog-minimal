@@ -37,7 +37,7 @@ A lot of research has been done to come up with some predefined kernels, but a n
 
 ### Kernels and how they work
 As explained earlier, kernels are matrices used to extract features or information from an image, but the question is how does a kernel extract information. A kernel matrix is slid across an image, and each element of the kernel matrix is multiplied with the element of image matrix, the results of these multiplications, are either average or maxium value is taken and then stored as a new image, which contains the extracted information. The image shown below shows how a kernel interacts with an input image to extract features.
-<img src="./kernelsMultiplicationWithImage.png" alt="Kernel multiplication with an image" width="600"/>
+<img src="./kernelsMultiplicationWithImage.png" alt="Kernel multiplication with an image" width="400"/>
 Kernel multiplication can be used to extract edges or other superficial features from an image. We will discuss about such kernels in further blogs.
 
 A collection of numerous kernels together can extract various levels of features from the same input image. This process is known as convolving an image to get a intermediate feature space. Numerous kernels are bunched together in form of different channels, and the output of the operation is a multi-channel image. Mathematical representation of the same can be done in the following manner:
