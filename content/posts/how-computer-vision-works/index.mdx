@@ -1,6 +1,6 @@
 ---
 title: How Computer Vision Works
-date: 2022-07-28
+date: 2022-09-10
 tags:
   - Computer Vision
   - Basic
@@ -38,8 +38,8 @@ A lot of research has been done to come up with some predefined kernels, but a n
 ### Kernels and how they work
 As explained earlier, kernels are matrices used to extract features or information from an image, but the question is how does a kernel extract information. A kernel matrix is slid across an image, and each element of the kernel matrix is multiplied with the element of image matrix, the results of these multiplications, are either average or maxium value is taken and then stored as a new image, which contains the extracted information. The image shown below shows how a kernel interacts with an input image to extract features.
 <img src="./kernelsMultiplicationWithImage.png" alt="Kernel multiplication with an image" width="400"/>
-Kernel multiplication can be used to extract edges or other superficial features from an image. We will discuss about such kernels in further blogs.
 
-A collection of numerous kernels together can extract various levels of features from the same input image. This process is known as convolving an image to get a intermediate feature space. Numerous kernels are bunched together in form of different channels, and the output of the operation is a multi-channel image. Mathematical representation of the same can be done in the following manner:
-- An input image I of size HxW with single channel, so it is a simple grayscale image with height H and width W.
-- M kernels having a size of 3x3, each kernel represented as k<sub>i</sub> where i ranges from 1 to M.
+Kernel multiplication can be used to extract edges or other superficial features from an image. We will discuss about such kernels in further blogs. A collection of kernels can be bunched together to extract various features from the same image, this process of stacking together kernels is used in convolutional neural networks to extract features from an image.
+
+### Conclusion
+We start with a simple understanding of a digital image, how it is stored and comprehended in a system. We then understand about pattern in an image, and how they lead to decision making in computer vision systems, and how a computer vision system uses kernels to extract information out of an image. In the coming blog, we will discuss more about kernels, and some pre-defined kernels, and how they are used to extract specific information from an image.
