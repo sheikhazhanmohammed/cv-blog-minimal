@@ -1,0 +1,32 @@
+---
+title: Hyperparameter Optimization
+date: 2022-10-01
+tags:
+  - Deep Learning
+  - Intermediate
+  - Hyperparameters
+  - Optimization
+  - Training
+---
+
+## What are hyperparameters
+Hyperparameters are parameters or configuration settings that control the learning process and determine the parameters a model ends up learning. In layman's terms, hyperparameters are restraints that guide the process of model training. The prefix 'hyper' suggests that these are the top-level parameters or settings that control the training process of a model. Hyperparameters are any values in a deep learning training configuration whose value is set before the training process begins. Some of the most commonly used hyperparameters in a deep learning training process are:
+- Learning Rate
+- Choice of Optimization algorithm to use
+- Choice of activation function in a neural network
+- Choice of the loss function to train the model
+- Drop-out Rate while training
+- Batch size to train the model
+The value of these hyperparameters plays a very important role when training any neural network, and can lead to huge changes in the final state or the final parameters of the trained model.
+
+### Choosing hyperparameters
+Optimizing the values of hyperparameters to get the best result in a certain training scenario can be a very difficult task. Existing methods include:
+- Grid Search, which iterates over set values of various hyperparameters to return the best set of hyperparameters.
+- Random Search, which replaces the exhaustive search method from grid search with a random selection of hyperparameters best suited for training the model.
+- Bayesian Optimization, which builds a probabilistic model of function mapping. Rather than iterating over the complete search space, Bayesian optimization exploits search spaces with a high probability of having good results, which are calculated based on previous runs.
+In this blog post, we shall see how to use [Optuna](https://optuna.readthedocs.io/en/stable/index.html) a hyperparameter optimization library. 
+
+### Setting the problem statement
+Before we begin with hyperparameter finetuning, we need a problem statement to tune the model on.
+We shall be using the [Arthropod Taxonomy Orders Object Detection Dataset](https://www.kaggle.com/datasets/mistag/arthropod-taxonomy-orders-object-detection-dataset), but for training a simple classification network. The ground truth bounding boxes are cropped out and the images obtained are saved as images of arthropods belonging to the respective class. We will be using a simple Convolutional Neural Network to study the impact of hyperparameter optimization. The network architecture is shown in the image below.
+![Network Architecture](./networkArchitecture.png)
