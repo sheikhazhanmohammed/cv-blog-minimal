@@ -17,6 +17,7 @@ Hyperparameters are parameters or configuration settings that control the learni
 - Choice of the loss function to train the model
 - Drop-out Rate while training
 - Batch size to train the model
+
 The value of these hyperparameters plays a very important role when training any neural network, and can lead to huge changes in the final state or the final parameters of the trained model.
 
 ### Choosing hyperparameters
@@ -24,9 +25,20 @@ Optimizing the values of hyperparameters to get the best result in a certain tra
 - Grid Search, which iterates over set values of various hyperparameters to return the best set of hyperparameters.
 - Random Search, which replaces the exhaustive search method from grid search with a random selection of hyperparameters best suited for training the model.
 - Bayesian Optimization, which builds a probabilistic model of function mapping. Rather than iterating over the complete search space, Bayesian optimization exploits search spaces with a high probability of having good results, which are calculated based on previous runs.
+
 In this blog post, we shall see how to use [Optuna](https://optuna.readthedocs.io/en/stable/index.html) a hyperparameter optimization library. 
 
 ### Setting the problem statement
 Before we begin with hyperparameter finetuning, we need a problem statement to tune the model on.
 We shall be using the [Arthropod Taxonomy Orders Object Detection Dataset](https://www.kaggle.com/datasets/mistag/arthropod-taxonomy-orders-object-detection-dataset), but for training a simple classification network. The ground truth bounding boxes are cropped out and the images obtained are saved as images of arthropods belonging to the respective class. We will be using a simple Convolutional Neural Network to study the impact of hyperparameter optimization. The network architecture is shown in the image below.
 ![Network Architecture](./networkArchitecture.png)
+To evaluate the performance of the model we will be using the accuracy metric. Note that an evaluation metric is necessary when performing hyperparameter optimization, this tells the optimizer (do not confuse this with network training optimizer) which set of hyperparameters gives the best result. The choice of metric may differ from problem to problem, some common problems and a good choice of evaluation metric are mentioned below:
+- Classification problem: In the case of a balanced dataset with an approximately equal number of classes, accuracy can be used. For an unbalanced classification problem, the F1 Score can be used.
+- Segmentation problem: IoU value can be used for a balanced dataset, for an unbalanced dataset, the F1 Score can be used.
+- Generative Networks: For generative networks, the metric may vary as per the use case, for an image-to-image translation network, L1 Loss can be used to compare various hyperparameter settings.
+
+Now that our problem statement is set, we can start with the code to initialize our training process and optimize our hyperparameters to the best values.
+
+### Setting up the training configuration
+The complete code for the blog can be found in the [Kaggle Notebook](https://www.kaggle.com/code/sheikhazhanmohammed/pytorch-tutorial-the-classification). In the blog post, we only discuss the important snippets of code that are related to hyperparameter optimization using Optuna.
+The complete dataset contains 8294 images belonging to 4 different classes and each class has an approximately equal number of images, so it is a balanced dataset. For optimizing the network we shall only be using 500 random images from each class to train the network, and an additional 100 images per class to validate the performance of the model.
