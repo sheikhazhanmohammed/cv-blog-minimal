@@ -41,4 +41,32 @@ Now that our problem statement is set, we can start with the code to initialize 
 
 ### Setting up the training configuration
 The complete code for the blog can be found in the [Kaggle Notebook](https://www.kaggle.com/code/sheikhazhanmohammed/pytorch-tutorial-the-classification). In the blog post, we only discuss the important snippets of code that are related to hyperparameter optimization using Optuna.
-The complete dataset contains 8294 images belonging to 4 different classes and each class has an approximately equal number of images, so it is a balanced dataset. For optimizing the network we shall only be using 500 random images from each class to train the network, and an additional 100 images per class to validate the performance of the model.
+The complete dataset contains 8294 images belonging to 4 different classes and each class has an approximately equal number of images, so it is a balanced dataset. For optimizing the network we shall only be using 500 random images sampled from each class to train the network, and an additional 100 images sampled per class to validate the performance of the model. This reduces the training time for each experiment. The selected images and labels are passed to the dataset class defined below:
+```python
+class CustomDataset(Dataset):
+    def __init__(self, pathToImages, labels, transform=None):
+        self.pathToImages = pathToImages
+        self.labels = labels
+        self.transform = transform
+        
+    def __len__(self):
+        return len(self.pathToImages)
+    
+    def __getitem__(self, index):
+        image = Image.open(self.pathToImages[index])
+        image = image.resize((256,256))
+        label = torch.tensor(self.labels[index])
+        if self.transform is not None:
+            image = self.transform(image)
+        return image, label
+
+trainDataset = CustomDataset(pathToTrainImages, trainImageLabels)
+validationDataset = CustomDataset(pathToTestImages, testImageLabels)
+
+trainLoader = torch.utils.data.DataLoader(trainDataset, batch_size=8)
+valLoader = torch.utils.data.DataLoader(validationDataset, batch_size=4)
+```
+Once we have our dataset and dataloader ready we can train the model, the simple training code is mentioned below:
+```python
+Train model
+```
