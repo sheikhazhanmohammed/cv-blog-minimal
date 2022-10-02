@@ -68,5 +68,43 @@ valLoader = torch.utils.data.DataLoader(validationDataset, batch_size=4)
 ```
 Once we have our dataset and dataloader ready we can train the model, the simple training code is mentioned below:
 ```python
-Train model
+def trainModel(model, trainLoader, optimizer, device):
+    model.train()
+    for (image, target) in trainLoader:
+        image, target = image.to(device), target.to(device)
+        optimizer.zero_grad()
+        F.nll_loss(model(image), target).backward()
+        optimizer.step()
 ```
+This simple training script can easily train the model. We can now evaluate the model's accuracy on the test set, this can be done using:
+```python
+def evalModel(model, valLoader):
+    model.eval()
+    correct = 0
+    with torch.no_grad():
+        for (image, target) in valLoader:
+            image, target = image.to(device), target.to(device)
+            prediction = model(image).argmax(dim=1, keepdim=True)
+            correct += pred.eq(target.view_as(pred)).sum().item()
+    accuracy = correct / N_VALID_EXAMPLES
+    return accuracy
+```
+Now that we have our train and validation function ready we can run the experiments by defining a simple experiment setup where we define the hyperparameters which we need to optimize. In this experiment we shall be optimizing the following hyperparameters:
+- Choice of optimizer
+- Learning rate for optimizer
+
+The optimization loop is written below, and the explanation is provided for each of the steps as well.
+```python
+def objective(trial):
+    device = "cuda"
+    model = NeuralNetwork()
+    model = model.to(device)
+    optimizerName = trial.suggest_categorical("optimizer", ["Adam", "RMSprop", "SGD"])
+    lr = trial.suggest_loguniform("lr", 1e-5, 1e-1)
+    optimizer = getattr(optim, optimizerName)(model.parameters(), lr=lr)
+    for epoch in range(10):
+        trainModel(model, trainLoader, optimizer, device)
+    accuracy = evalModel(model, valLoader)
+    return accuracy
+```
+Here the variable ```optimizerName
