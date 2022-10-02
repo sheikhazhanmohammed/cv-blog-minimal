@@ -40,7 +40,7 @@ To evaluate the performance of the model we will be using the accuracy metric. N
 Now that our problem statement is set, we can start with the code to initialize our training process and optimize our hyperparameters to the best values.
 
 ### Setting up the training configuration
-The complete code for the blog can be found in the [Kaggle Notebook](https://www.kaggle.com/code/sheikhazhanmohammed/pytorch-tutorial-the-classification). In the blog post, we only discuss the important snippets of code that are related to hyperparameter optimization using Optuna.
+The complete code for the blog can be found in the [Kaggle Notebook](https://www.kaggle.com/sheikhazhanmohammed/hyperparameter-optimization-using-optuna). In the blog post, we only discuss the important snippets of code that are related to hyperparameter optimization using Optuna.
 The complete dataset contains 8294 images belonging to 4 different classes and each class has an approximately equal number of images, so it is a balanced dataset. For optimizing the network we shall only be using 500 random images sampled from each class to train the network, and an additional 100 images sampled per class to validate the performance of the model. This reduces the training time for each experiment. The selected images and labels are passed to the dataset class defined below:
 ```python
 class CustomDataset(Dataset):
@@ -86,14 +86,14 @@ def evalModel(model, valLoader):
             image, target = image.to(device), target.to(device)
             prediction = model(image).argmax(dim=1, keepdim=True)
             correct += pred.eq(target.view_as(pred)).sum().item()
-    accuracy = correct / N_VALID_EXAMPLES
+    accuracy = correct / 400
     return accuracy
 ```
 Now that we have our train and validation function ready we can run the experiments by defining a simple experiment setup where we define the hyperparameters which we need to optimize. In this experiment we shall be optimizing the following hyperparameters:
 - Choice of optimizer
-- Learning rate for optimizer
+- Learning rate for the optimizer
 
-The optimization loop is written below, and the explanation is provided for each of the steps as well.
+The optimization loop is written below, and an explanation is provided for each of the steps as well.
 ```python
 def objective(trial):
     device = "cuda"
@@ -107,4 +107,30 @@ def objective(trial):
     accuracy = evalModel(model, valLoader)
     return accuracy
 ```
-Here the variable ```optimizerName
+Here the variable ```optimizerName``` contains the various optimizers that are to be tested, and the variable ```lr``` contains a range over which the learning rate can be chosen from. The rest of the loop contains the code to train the model and then evaluate it. We return the accuracy over the validation set at the end, which is the chosen metric to decide the best set of hyperparameters for the training.
+The optimization can then be performed using:
+```python
+study = optuna.create_study(direction="maximize")
+study.optimize(objective, n_trials=30)
+
+pruned_trials = [t for t in study.trials if t.state == optuna.structs.TrialState.PRUNED]
+complete_trials = [t for t in study.trials if t.state == optuna.structs.TrialState.COMPLETE]
+
+print("Study statistics:")
+print("Number of finished trials:", len(study.trials))
+print("Number of pruned trials:", len(pruned_trials))
+print("Number of complete trials:", len(complete_trials))
+
+print("Best trial:")
+trial = study.best_trial
+
+print("Value:", trial.value)
+
+print("Params:")
+for key, value in trial.params.items():
+    print("{}: {}".format(key, value))
+```
+This will print the best hyperparameters for the run which can then be used to train the model on the complete dataset.
+
+### Conclusion
+In this blog post, we discuss how to finetune hyperparameters which play a very important task in training a model. We discuss how we can use Optuna, an open-source library to finetune our hyperparameters for any given model and dataset using pre-defined settings and choices.
