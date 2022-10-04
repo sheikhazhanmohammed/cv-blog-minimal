@@ -1,0 +1,27 @@
+---
+title: Training a Classifier using PyTorch
+date: 2022-10-03
+tags:
+  - Deep Learning
+  - Intermediate
+  - Computer Vision
+  - Convolution
+  - Neural Network
+  - Optimization
+  - Training
+---
+
+## Training a Custom Convolution Neural Network
+Most of the available tutorials on training a CNN use the MNIST data as input to the model. While using MNIST data as a beginner can be easy, working with custom datasets can be a bit of a problem.
+![MNIST Meme](./mnist-meme.jpg)
+In this blog post we will be discussing:
+- Creating a custom dataset to train a neural network on
+- Creating a custom Convolution Neural Network
+- Training the custom network on our dataset
+- Evaluating the network on a test set
+
+Before we start, we shall discuss how to collect images for your custom dataset. For this, we use [Image Downloader](https://chrome.google.com/webstore/detail/image-downloader/cnpniohnfphhjihaiiggeabnkjhpaldj) a chrome extension that allows you to download all the images in a given webpage. We could have used a python tool as well, but the extension allows us to manually deselect images we do not require, this means we will not need to check the downloaded images later and manually remove unwanted images at a later stage. Once we have installed the extension, we can start downloading multiple images using the extension easily. For the sake of our tutorial, we shall be creating a classifier that can classify grasshoppers, praying mantes and dragonflies. We start with downloading images for grasshoppers.
+
+The attached video shows in detail how we can download multiple images using the Image Downloader extension. We first scroll down until the page limit is exhausted, this makes sure that we get enough images. We can then open the extension and then manually check the images and unselect the irrelevant images like cartoons, drawings, and images belonging to other insects or animals. Once that is done, we can mention that we need the images in a separate sub-folder and start the download. This will create a sub-folder by name of "grasshoppers" in your default download location and you can find the images in the folder.
+
+<iframe src="https://player.vimeo.com/video/756742272?h=7be2e0573c&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" width="1024" height="665" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Downloading images using Image Downloader"></iframe>
