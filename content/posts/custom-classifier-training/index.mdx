@@ -20,6 +20,9 @@ In this blog post we will be discussing:
 - Training the custom network on our dataset
 - Evaluating the network on a test set
 
+
+### Downloading images for custom classifier
+
 Before we start, we shall discuss how to collect images for your custom dataset. For this, we use [Image Downloader](https://chrome.google.com/webstore/detail/image-downloader/cnpniohnfphhjihaiiggeabnkjhpaldj) a chrome extension that allows you to download all the images in a given webpage. We could have used a python tool as well, but the extension allows us to manually deselect images we do not require, this means we will not need to check the downloaded images later and manually remove unwanted images at a later stage. Once we have installed the extension, we can start downloading multiple images using the extension easily. For the sake of our tutorial, we shall be creating a classifier that can classify grasshoppers, praying mantes and dragonflies. We start with downloading images for grasshoppers.
 
 The attached video shows in detail how we can download multiple images using the Image Downloader extension. We first scroll down until the page limit is exhausted, this makes sure that we get enough images. We can then open the extension and then manually check the images and unselect the irrelevant images like cartoons, drawings, and images belonging to other insects or animals. Once that is done, we can mention that we need the images in a separate sub-folder and start the download. This will create a sub-folder by name of "grasshoppers" in your default download location and you can find the images in the folder.
@@ -27,3 +30,32 @@ The attached video shows in detail how we can download multiple images using the
 <div align="center">
 <iframe src="https://player.vimeo.com/video/756742272?h=7be2e0573c&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" width="968" height="629" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Downloading images using Image Downloader"></iframe>
 </div>
+
+We can then transfer the downloaded folder into our working directory. The working directory structure for this experiment can be found in the GitHub repository [here](). Once we have the images for all the classes downloaded, we can start to arrange our data. Before doing that, we would need to rename our files, most of the images we had downloaded earlier can have different extensions and irregular names. We need to write a script that reads these images and rewrites the image as a "jpg" image with a regular naming scheme. This can be done with the script given below:
+
+```python
+import os
+import cv2
+from tqdm import tqdm
+
+i = 0
+for fileName in tqdm(os.listdir("./data/grasshoppers")):
+    fileName = os.path.join("./data/grasshoppers",fileName)
+    try:
+        image = cv2.imread(fileName)
+        imageNewName = "image"+str(i)+".jpg"
+        imageNewName = os.path.join("./data/grasshoppers",imageNewName)
+        cv2.imwrite(imageNewName, image)
+        os.remove(fileName)
+        i = i + 1
+    except:
+        os.remove(fileName)
+```
+
+In the above script, we first iterate over the files in the folder, then the try block checks if the image can be loaded, written as a jpg file, and then deletes the image, in case any of the steps in the try block fails, we just remove the image in the except block. This gives us all the images in any folder with any extension as a jpg file in a properly named fashion. We do this for all the 3 classes we have.
+
+Once this is done, we can start with our dataset class.
+
+### Defining the dataset class and creating dataloader
+
+Now that our images are all set, we can start with creating a dataset class that will feed the image and labels to our dataloader. We just need a few 
