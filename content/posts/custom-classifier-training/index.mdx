@@ -31,7 +31,7 @@ The attached video shows in detail how we can download multiple images using the
 <iframe src="https://player.vimeo.com/video/756742272?h=7be2e0573c&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" width="968" height="629" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Downloading images using Image Downloader"></iframe>
 </div>
 
-We can then transfer the downloaded folder into our working directory. The working directory structure for this experiment can be found in the GitHub repository [here](). Once we have the images for all the classes downloaded, we can start to arrange our data. Before doing that, we would need to rename our files, most of the images we had downloaded earlier can have different extensions and irregular names. We need to write a script that reads these images and rewrites the image as a "jpg" image with a regular naming scheme. This can be done with the script given below:
+We can then transfer the downloaded folder into our working directory. The working directory structure for this experiment can be found in the GitHub repository [here](https://github.com/sheikhazhanmohammed/codebase-cv-blog/tree/main/customClassifierTraining). Once we have the images for all the classes downloaded, we can start to arrange our data. Before doing that, we would need to rename our files, most of the images we had downloaded earlier can have different extensions and irregular names. We need to write a script that reads these images and rewrites the image as a "jpg" image with a regular naming scheme. This can be done with the script given below:
 
 ```python
 import os
@@ -85,7 +85,11 @@ lb = LabelEncoder()
 data['EncodedLabels'] = lb.fit_transform(data['Labels'])
 
 dataTrain = data[0:int(0.9*len(data))]
+dataTrain = dataTrain.sample(frac=1).reset_index(drop=True)
 dataTest = data[int(0.9*len(data)):]
+dataTest = dataTest.sample(frac=1).reset_index(drop=True)
+print("Size of training set:",len(dataTrain))
+print("Size of testing set:",len(dataTest))
 ```
 Now that we have everything in place, we can start with defining the dataset class. The dataset class is shown below:
 ```python
@@ -157,5 +161,97 @@ The architecture is depicted in the image below:
 ![Neural network architecture](./neuralNetwork.drawio.png)
 The neural network can be defined using the code snippet below:
 ```python
-network
+class Net(nn.Module):
+    def __init__(self):
+        super(Net, self).__init__()
+        self.conv1 = nn.Sequential(nn.Conv2d(3, 32, kernel_size=3),
+                                    nn.BatchNorm2d(32),
+                                    nn.ReLU(),
+                                    nn.MaxPool2d((2,2)))
+        self.conv2 = nn.Sequential(nn.Conv2d(32, 64, kernel_size=3),
+                                    nn.BatchNorm2d(64),
+                                    nn.ReLU(),
+                                    nn.MaxPool2d((2,2)))
+        self.conv3 = nn.Sequential(nn.Conv2d(64, 128, kernel_size=3),
+                                    nn.BatchNorm2d(128),
+                                    nn.ReLU(),
+                                    nn.MaxPool2d((2,2)))
+        self.conv4 = nn.Sequential(nn.Conv2d(128, 256, kernel_size=3),
+                                    nn.BatchNorm2d(256),
+                                    nn.ReLU(),
+                                    nn.Flatten())
+        self.fc1 = nn.Linear(200704, 512)
+        self.fc2 = nn.Linear(512, 256)
+        self.classification = nn.Linear(256, 3)
+        
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.conv2(x)
+        x = self.conv3(x)
+        x = self.conv4(x)
+        x = self.fc1(x)
+        x = self.fc2(x)
+        x = self.classification(x)
+        x = F.log_softmax(x,dim = 1)
+        return x
 ```
+Once this is done, we declare the model and transfer it to our device. This is done using:
+```python
+model = Net()
+model.to(device)
+```
+Next, we begin our training loop and evaluation function, which trains the model using our custom dataset and evaluates it on the test set. The next section covers the training loop and evaluation function.
+
+### Training loop and Evaluation function
+
+We first define our evaluation function, shown in the snippet below:
+```python
+def evaluateModel(model):
+    totalT=0
+    correctT=0
+    model.eval()
+    with torch.no_grad():
+        for dataT, targetT in (testLoader):
+            dataT, targetT = dataT.to(device), targetT.to(device)
+            outputT = model(dataT)
+            _, predictionT = torch.max(outputT, dim=1)
+            correctT += torch.sum(predictionT==targetT).item()
+            totalT += targetT.size(0)
+        valiationAccuracy = 100 * (correctT / totalT)
+    return valiationAccuracy
+```
+Next, we declare the loss function and optimizer for training the model:
+```python
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.0001)
+```
+Once that is done, we can start with the training loop:
+```python
+numberOfEpochs = 10
+summaryInterval = 100
+validationAccuracyMax = 0.0
+totalSteps = len(trainLoader)
+for epoch in range(1, numberOfEpochs+1):
+    print(f'Epoch {epoch}')
+    for batch_idx, (data, target) in enumerate(trainLoader):
+        data, target = data.to(device), target.to(device)
+        optimizer.zero_grad()
+        outputs = model(data)
+        loss = criterion(outputs, target)
+        loss.backward()
+        optimizer.step()
+        if(batch_idx)%summaryInterval==0:
+            print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' .format(epoch, numberOfEpochs, batch_idx, totalSteps, loss.item()))
+    validationAccuracy = evaluateModel(model)
+    print("Completed training for first epoch")
+    print("Accuracy on validation set:", validationAccuracy)
+    if validationAccuracyMax<=validationAccuracy:
+        validationAccuracyMax = validationAccuracy
+        torch.save(model.state_dict(), 'classificationModel.pt')
+        print('Detected network improvement, saving current model')
+    model.train()
+```
+This loop shall start training the model and save the model which achieves the best validation results. 
+
+### Conclusion
+In this blog post, we learn about how to train a custom neural network on a custom dataset. Remember that the code snippets here are bits and pieces of the actual training code, and the complete training folder can be found [here](https://github.com/sheikhazhanmohammed/codebase-cv-blog/tree/main/customClassifierTraining). 
