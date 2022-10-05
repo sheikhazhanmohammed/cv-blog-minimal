@@ -58,4 +58,104 @@ Once this is done, we can start with our dataset class.
 
 ### Defining the dataset class and creating dataloader
 
-Now that our images are all set, we can start with creating a dataset class that will feed the image and labels to our dataloader. We just need a few 
+Now that our images are all set, we can start with creating a dataset class that will feed the image and labels to our dataloader. We first need a list of paths to images and labels for the images. This can be easily done using:
+```python
+images = []
+labels = []
+for folder in os.listdir("./data"):
+    if folder=="dragonfly":
+        for filename in os.listdir(os.path.join("./data", folder)):
+            images.append(os.path.join("./data", folder, filename))
+            labels.append("dragonfly")
+    if folder=="grasshoppers":
+        for filename in os.listdir(os.path.join("./data", folder)):
+            images.append(os.path.join("./data", folder, filename))
+            labels.append("grasshoppers")
+    if folder=="prayingMantes":
+        for filename in os.listdir(os.path.join("./data", folder)):
+            images.append(os.path.join("./data", folder, filename))
+            labels.append("prayingMantes")
+```
+This generates two lists, one that contains paths to the images and another that contains the respective label for the images. We then create a pandas data frame out of the lists and then shuffle them. Next, we use a label encoder to turn the text label into numerical values, these numerical values will be used as labels for training the neural network. Next, we split the dataset in a 9:1 ratio, where we separate 90% of the data to train the model, and the rest 10% will be used to validate the model. This can be done using:
+```python
+data = {'ImagePath':images, 'Labels':labels} 
+data = pd.DataFrame(data)
+data = data.sample(frac=1).reset_index(drop=True)
+lb = LabelEncoder()
+data['EncodedLabels'] = lb.fit_transform(data['Labels'])
+
+dataTrain = data[0:int(0.9*len(data))]
+dataTest = data[int(0.9*len(data)):]
+```
+Now that we have everything in place, we can start with defining the dataset class. The dataset class is shown below:
+```python
+class InsectDataset(Dataset):
+    def __init__(self, pathToImages, labels, transform=None):
+        self.pathToImages = pathToImages
+        self.transform = transform
+        self.labels = labels
+        
+    def __len__(self):
+        return len(self.pathToImages)
+    
+    def __getitem__(self, index):
+        image = Image.open(self.pathToImages[index])
+        #converts images to rgb
+        image = image.convert('RGB')
+        #resizing image to 256x256
+        image = image.resize((256,256))
+        label = torch.tensor(self.labels[index])
+        if self.transform is not None:
+            image = self.transform(image)
+        return image, label
+```
+Once the dataset class is declared, we can create the dataset and the dataloader. This can be done using the code snippet below:
+```python
+transform = transforms.Compose(
+    [transforms.ToTensor(),
+     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+datasetTrain = InsectDataset(dataTrain['ImagePath'], dataTrain['EncodedLabels'], transform)
+datasetTest = InsectDataset(dataTest['ImagePath'], dataTest['EncodedLabels'], transform)
+
+trainLoader = torch.utils.data.DataLoader(datasetTrain, batch_size=8)
+testLoader = torch.utils.data.DataLoader(datasetTest, batch_size=4)
+```
+We can check our trainLoader and display the images and labels with a simple function, this will help us verify if our loader is working correctly.
+```python
+def displayImage(image):
+    image = image / 2 + 0.5
+    image = image.numpy()
+    image = np.transpose(image, (1, 2, 0))
+    return image
+
+dataiter = iter(trainLoader)
+images, labels = dataiter.next()
+insectType = {0: 'dragonfly', 1: 'grasshopper', 2: 'praying mantis'}
+# Viewing data examples used for training
+fig, axis = plt.subplots(2, 4, figsize=(15, 10))
+for i, ax in enumerate(axis.flat):
+    with torch.no_grad():
+        image, label = images[i], labels[i]
+        ax.imshow(displayImage(image)) # add image
+        ax.set(title = f"{insectType[label.item()]}")
+        ax.set_xticks([])
+        ax.set_yticks([])
+```
+The output image should look like this:
+![Dataset visualization](./dataset-visualization.png)
+Now that our dataset is complete, we can start with defining our custom neural network. The next session covers the neural network definition.
+
+### The Neural Network
+
+We shall be using a very simple convolutional neural network for the task. The neural network is composed of various layers, they are mentioned below:
+- Convolution layer
+- Batch Normalization layer
+- Activation layer
+- MaxPooling layer
+The architecture is depicted in the image below:
+![Neural network architecture](./neuralNetwork.drawio.png)
+The neural network can be defined using the code snippet below:
+```python
+network
+```
