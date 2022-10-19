@@ -11,13 +11,10 @@ tags:
   - Training
 ---
 
-## Training a Custom Convolution Neural Network
-Training a segmentation model 
-In this blog post we will be discussing:
-- Creating a custom dataset to train a neural network on
-- Creating a custom Convolution Neural Network
-- Training the custom network on our dataset
-- Evaluating the network on a test set
+## Training an Image Segmentation model
+Image segmentation is a sub-domain of computer vision where the goal is to group similar pixels or segments of an image under their respective class labels. Image segmentation can be seen as an extension to image classification, where we assign each pixel an individual label, rather than having a single label for all the pixels in an image.
+
+In computer vision, most segmentation models are created using an encoder-decoder network, as compared to having just an encoder network in classification models. The encoder creates a latent space representation of the input image, which is then expanded into a segmentation map by the decoder. A typical segmentation map looks like
 
 
 ### Downloading images for custom classifier
